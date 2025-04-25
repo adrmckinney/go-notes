@@ -2,7 +2,6 @@ package factories
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/adrmckinney/go-notes/models"
 	"github.com/adrmckinney/go-notes/utils"
@@ -17,12 +16,9 @@ func NoteFactory(count int, title string, content string) []models.Note {
 	}
 
 	for i := range count {
-		now := time.Now().UTC()
 		notes[i] = models.Note{
-			Title:    titles[i],
-			Content:  sentences[i],
-			Added:    now.Format(time.RFC3339),
-			Modified: now.Format(time.RFC3339),
+			Title:   titles[i],
+			Content: sentences[i],
 		}
 	}
 
