@@ -1,19 +1,24 @@
 # Notes App
 
 ## Table of Contents
-- [Overview](#overview)
-  - [Tools and Libraries](#tools-and-libraries)
-  - [Architecture](#architecture)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Steps to Start the Server](#steps-to-start-the-server)
-  - [Configure the Database (OPTIONAL)](#configure-the-database-optional)
-  - [Migrations](#migrations)
-  - [Seeding the Database](#seeding-the-database)
-  - [Using the API with Postman](#using-the-api-with-postman)
-- [Running Tests](#running-tests)
-- [Teardown Instructions](#teardown-instructions)
-- [API Endpoints](#api-endpoints)
+- [Notes App](#notes-app)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+    - [Tools and Libraries](#tools-and-libraries)
+    - [Architecture](#architecture)
+    - [Tests](#tests)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Get the app](#get-the-app)
+    - [Configure the Database (OPTIONAL)](#configure-the-database-optional)
+    - [Migrations](#migrations)
+    - [Seeding the Database](#seeding-the-database)
+    - [Starting the server](#starting-the-server)
+    - [Using the API with Postman](#using-the-api-with-postman)
+  - [Running Tests](#running-tests)
+  - [Teardown Instructions](#teardown-instructions)
+  - [API Endpoints](#api-endpoints)
+    - [Notes](#notes)
 
 This is a simple Notes application built with Go. The app allows users to create, retrieve, update, and delete notes. It follows a repository-style architecture for clean separation of concerns and includes comprehensive tests to ensure functionality.
 
@@ -64,14 +69,8 @@ The app includes comprehensive tests for all major functionalities:
 
 ---
 
-### Steps to Start the Server
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/go-notes.git
-   cd go-notes
-2. Initialize the database: `go run main.go migrate`
-3. Start the server: `go run main.go`
-4. The server will run on `http://localhost:8080`.
+### Get the app
+- Clone it: `git clone https://github.com/adrmckinney/go-notes.git`
 
 ### Configure the Database (OPTIONAL)
 - The code is setup to automatically install a MySQL DB with default env variables. If you would like to you can modify the default values in the config.go file.
@@ -80,7 +79,10 @@ The app includes comprehensive tests for all major functionalities:
 - Run the following command to create the database and tables: `go run main.go --migrate`
 
 ### Seeding the Database
-To populate the database with initial data, run the seeders: `go run main.go --seedDev`
+- To populate the database with initial data, run the seeders: `go run main.go --seedDev`
+
+### Starting the server
+- Run `go run main.go`
 
 ### Using the API with Postman
 Once the server is running, you can use Postman to interact with the API. Below are the available endpoints:
