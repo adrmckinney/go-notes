@@ -1,14 +1,18 @@
 module github.com/adrmckinney/go-notes
 
-go 1.24.2
+go 1.24
+
+require (
+	github.com/go-sql-driver/mysql v1.9.2
+	github.com/golang-migrate/migrate/v4 v4.18.3
+	github.com/gorilla/mux v1.8.1
+	modernc.org/sqlite v1.37.0
+)
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/go-sql-driver/mysql v1.9.2 // indirect
-	github.com/golang-migrate/migrate/v4 v4.18.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -20,5 +24,4 @@ require (
 	modernc.org/libc v1.62.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.9.1 // indirect
-	modernc.org/sqlite v1.37.0 // indirect
 )

@@ -10,10 +10,9 @@
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Get the app](#get-the-app)
-    - [Configure the Database (OPTIONAL)](#configure-the-database-optional)
+    - [Using Docker to Run the Project](#using-docker-to-run-the-project)
     - [Migrations](#migrations)
     - [Seeding the Database](#seeding-the-database)
-    - [Starting the server](#starting-the-server)
     - [Using the API with Postman](#using-the-api-with-postman)
   - [Running Tests](#running-tests)
   - [Teardown Instructions](#teardown-instructions)
@@ -63,26 +62,42 @@ The app includes comprehensive tests for all major functionalities:
 
 ### Prerequisites
 - Go installed on your machine (version 1.18 or higher).
-- MySQL installed and running on your machine.
-  - Ensure you have the MySQL credentials (e.g., username, password, and host).
-  - The app will create a database called `mckinney_go_notes_db` during the migration process.
-
+- Docker installed (if using Docker).
+- Docker Compose installed (if using Docker).
+- Postman or any other API testing tool.
 ---
 
 ### Get the app
 - Clone it: `git clone https://github.com/adrmckinney/go-notes.git`
 
-### Configure the Database (OPTIONAL)
-- The code is setup to automatically install a MySQL DB with default env variables. If you would like to you can modify the default values in the config.go file.
+### Using Docker to Run the Project
+
+1. **Install Docker**:
+   - Ensure Docker and Docker Compose are installed on your machine.
+
+2. **Build and Start the Containers**:
+   - Run the following command to build and start the containers:
+     ```bash
+     docker compose up --build
+     ```
+
+3. **Access the Application**:
+   - The application will be available at `http://localhost:8080`.
+
+4. **Stop the Containers**:
+   - To stop the containers, press `Ctrl+C` or run:
+     ```bash
+     docker-compose down
+     ```
+
+5. **Database Persistence**:
+   - The MySQL database data is stored in a Docker volume (`db_data`) to ensure persistence across container restarts.
 
 ### Migrations
 - Run the following command to create the database and tables: `go run main.go --migrate`
 
 ### Seeding the Database
 - To populate the database with initial data, run the seeders: `go run main.go --seedDev`
-
-### Starting the server
-- Run `go run main.go`
 
 ### Using the API with Postman
 Once the server is running, you can use Postman to interact with the API. Below are the available endpoints:
