@@ -28,7 +28,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: mckinney_go_notes_db
-      MYSQL_USER: root
       MYSQL_PASSWORD: password
     ports:
       - '3306:3306'
