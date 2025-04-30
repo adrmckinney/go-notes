@@ -116,7 +116,7 @@ The app includes comprehensive tests for all major functionalities:
 - See the `Makefile` for more migration commands and options.
 
 ### Seeding the Database
-- To populate the database with initial data, run the seeders: `go run main.go --seedDev`
+- To populate the database with initial data, run the seeders: `docker compose exec app make seed-dev`
 
 ### Using the API with Postman
 Once the server is running, you can use Postman to interact with the API. Below are the available endpoints:

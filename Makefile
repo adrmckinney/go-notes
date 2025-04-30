@@ -20,3 +20,9 @@ migrate-force:
 
 migrate-version:
 	$(MIGRATE) version
+
+
+SEED=go run ./cmd/seed
+
+seed-dev:
+	$(SEED)
