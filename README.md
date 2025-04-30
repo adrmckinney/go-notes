@@ -29,9 +29,11 @@ There is currently no frontend for this app. I wanted to learn Go so implementin
 
 ### Tools and Libraries
 - **Go**: The primary programming language used for the application.
+- **GORM**: The ORM (Object Relational Mapper) used for database interactions, migrations, and model management.
 - **MySQL**: The main database for the app.
 - **SQLite**: Database used for running API tests.
 - **Gorilla Mux**: Handles HTTP requests.
+- **golang-migrate**: For running database migrations in a controlled, versioned manner.
 - **Testing**:
   - Built-in Go testing framework (`testing` package).
   - `httptest` for simulating HTTP requests and responses.

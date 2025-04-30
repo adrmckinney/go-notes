@@ -2,12 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/adrmckinney/go-notes/models"
 	"github.com/adrmckinney/go-notes/repos"
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 type NoteHandler struct {
@@ -29,12 +30,13 @@ func (h *NoteHandler) GetNotes(w http.ResponseWriter, _ *http.Request) {
 
 func (h *NoteHandler) GetNote(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["id"]
-	if id == "" {
-		http.Error(w, "Missing 'id' path parameter", http.StatusBadRequest)
+	idStr := vars["id"]
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
-	note, err := h.NoteRepo.GetNoteById(id)
+	note, err := h.NoteRepo.GetNoteById(uint(id))
 	if err != nil {
 		http.Error(w, "Note not found", http.StatusNotFound)
 	}
@@ -52,16 +54,11 @@ func (h *NoteHandler) CreateNote(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Title and Content are required", http.StatusBadRequest)
 		return
 	}
-	id, err := h.NoteRepo.CreateNote(note)
+	createdNote, err := h.NoteRepo.CreateNote(note)
 
 	if err != nil {
 		http.Error(w, "Failed to create note", http.StatusInternalServerError)
 		return
-	}
-
-	createdNote, err := h.NoteRepo.GetNoteById(fmt.Sprintf("%d", id))
-	if err != nil {
-		http.Error(w, "Note not found", http.StatusNotFound)
 	}
 
 	w.WriteHeader(http.StatusCreated)
@@ -70,35 +67,40 @@ func (h *NoteHandler) CreateNote(w http.ResponseWriter, r *http.Request) {
 
 func (h *NoteHandler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["id"]
-	if id == "" {
-		http.Error(w, "Missing 'id' path parameter", http.StatusBadRequest)
+	idStr := vars["id"]
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
 
-	var note models.Note
-	if err := json.NewDecoder(r.Body).Decode(&note); err != nil {
+	var updateData map[string]any
+	if err := json.NewDecoder(r.Body).Decode(&updateData); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
-	if note.Title == "" && note.Content == "" {
-		http.Error(w, "At least one of 'title' or 'content' must be provided", http.StatusBadRequest)
+	filtered := models.FilterUpsertFields(updateData, models.AllowedNoteUpdateFields)
+
+	if len(updateData) == 0 {
+		http.Error(w, "No update data provided", http.StatusBadRequest)
 		return
 	}
 
-	err := h.NoteRepo.UpdateNote(id, note)
-	if err != nil {
-		http.Error(w, "Failed to update note", http.StatusInternalServerError)
-	}
+	updatedNote, err := h.NoteRepo.UpdateNote(uint(id), filtered)
 
-	updatedNote, err := h.NoteRepo.GetNoteById(id)
 	if err != nil {
-		http.Error(w, "Failed to retrieve updated note", http.StatusInternalServerError)
+		// Check for GORM's record not found error
+		if err == gorm.ErrRecordNotFound ||
+			(err.Error() != "" && (err.Error() == "note not found" ||
+				err.Error() == "note not found: record not found")) {
+			http.Error(w, "Note not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(updatedNote)
 }
 
@@ -110,7 +112,7 @@ func (h *NoteHandler) DeleteNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	message, err := h.NoteRepo.DeleteNote(id)
+	err := h.NoteRepo.DeleteNote(id)
 
 	if err != nil {
 		http.Error(w, "Failed to delete note", http.StatusInternalServerError)
@@ -118,5 +120,7 @@ func (h *NoteHandler) DeleteNote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(message)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Note successfully deleted",
+	})
 }

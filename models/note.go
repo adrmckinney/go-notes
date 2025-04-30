@@ -1,9 +1,26 @@
 package models
 
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
 type Note struct {
-	ID       int    `json:"id"`
-	Title    string `json:"title"`
-	Content  string `json:"content"`
-	Added    string `json:"added"`
-	Modified string `json:"modified"`
+	ID        uint           `json:"id,omitempty" gorm:"primaryKey"`
+	Title     string         `json:"title,omitempty"`
+	Content   string         `json:"content,omitempty"`
+	CreatedAt time.Time      `json:"createdAt,omitempty"`
+	UpdatedAt time.Time      `json:"updatedAt,omitempty"`
+	DeletedAt gorm.DeletedAt `json:"deletedAt,omitempty" gorm:"index"`
+}
+
+var AllowedNoteCreateFields = map[string]bool{
+	"title":   true,
+	"content": true,
+}
+
+var AllowedNoteUpdateFields = map[string]bool{
+	"title":   true,
+	"content": true,
 }

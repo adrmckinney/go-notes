@@ -21,14 +21,17 @@ func main() {
 	removeFlag := flag.Bool("remove", false, "Removes the entire mckinney_go_notes_db")
 	flag.Parse()
 
-	db.Init()
+	if *migrateFlag {
+		db.EnsureDatabaseExists() // Have to initialize MySQL DB connection to check/create DB before initializing GORM
+		db.InitGorm()
+		db.RunMigrations()
+		return
+	}
+
+	db.InitGorm()
 
 	if *seedDev {
 		seeders.RunDevSeeders()
-		return
-	}
-	if *migrateFlag {
-		db.RunMigrations()
 		return
 	}
 	if *rollbackFlag {
@@ -40,7 +43,8 @@ func main() {
 		return
 	}
 
-	r := routes.NewRouter(db.DB)
+	r := routes.NewRouter(db.GormDB)
+
 	log.Println("Server starting on :8080...")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

@@ -1,21 +1,15 @@
 package handlers
 
 import (
-	"database/sql"
-	"log"
-
 	"github.com/adrmckinney/go-notes/repos"
+	"gorm.io/gorm"
 )
 
 type Handlers struct {
 	NoteHandler *NoteHandler
 }
 
-func InitHandlers(db *sql.DB) *Handlers {
-	if err := db.Ping(); err != nil {
-		log.Fatalf("Database connection is invalid: %v", err)
-	}
-
+func InitHandlers(db *gorm.DB) *Handlers {
 	noteRepo := &repos.NoteRepo{DB: db}
 
 	// Initialize handlers with repositories

@@ -3,7 +3,6 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -25,7 +24,6 @@ func TestCreateNote(t *testing.T) {
 		t.Fatalf("Failed to encode request body: %v", err)
 	}
 
-	// Create a new HTTP request
 	req, err := http.NewRequest("POST", "/notes", bytes.NewBuffer(reqBody))
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
@@ -37,12 +35,10 @@ func TestCreateNote(t *testing.T) {
 	rr := httptest.NewRecorder()
 	router.ServeHTTP(rr, req)
 
-	// Check the response status code
 	if status := rr.Code; status != http.StatusCreated {
 		t.Errorf("Handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
 
-	// Decode the response body
 	var createdNote models.Note
 	err = json.Unmarshal(rr.Body.Bytes(), &createdNote)
 	if err != nil {
@@ -50,7 +46,7 @@ func TestCreateNote(t *testing.T) {
 	}
 
 	// Verify the note was inserted into the database
-	_, err = NoteRepo.GetNoteById(fmt.Sprintf("%d", createdNote.ID))
+	_, err = NoteRepo.GetNoteById(uint(createdNote.ID))
 	if err != nil {
 		t.Fatalf("Failed to fetch note from database: %v", err)
 	}
