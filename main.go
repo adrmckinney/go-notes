@@ -8,38 +8,17 @@ import (
 	"github.com/adrmckinney/go-notes/db"
 	"github.com/adrmckinney/go-notes/routes"
 	"github.com/adrmckinney/go-notes/seeders"
-
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func main() {
 	// Define the flags
 	seedDev := flag.Bool("seedDev", false, "Run development seeders")
-	migrateFlag := flag.Bool("migrate", false, "Run database migrations")
-	rollbackFlag := flag.Bool("migrate:rollback", false, "Rollback database migrations")
-	stepsFlag := flag.Int("steps", 0, "Number of migration steps to rollback (default: 0 for all)")
-	removeFlag := flag.Bool("remove", false, "Removes the entire mckinney_go_notes_db")
 	flag.Parse()
-
-	if *migrateFlag {
-		db.EnsureDatabaseExists() // Have to initialize MySQL DB connection to check/create DB before initializing GORM
-		db.InitGorm()
-		db.RunMigrations()
-		return
-	}
 
 	db.InitGorm()
 
 	if *seedDev {
 		seeders.RunDevSeeders()
-		return
-	}
-	if *rollbackFlag {
-		db.RunRollback(*stepsFlag)
-		return
-	}
-	if *removeFlag {
-		db.RunRemoveDatabase()
 		return
 	}
 

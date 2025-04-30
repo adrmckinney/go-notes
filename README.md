@@ -96,7 +96,28 @@ The app includes comprehensive tests for all major functionalities:
    - The MySQL database data is stored in a Docker volume (`db_data`) to ensure persistence across container restarts.
 
 ### Migrations
-- Run the following command to create the database and tables: `go run main.go --migrate`
+- This project uses [golang-migrate](https://github.com/golang-migrate/migrate) for database migrations.
+- **To run migrations (apply all up migrations):**
+  ```bash
+  make migrate-up
+  ```
+- **To rollback the last migration:**
+  ```bash
+  make migrate-down
+  ```
+- **To rollback multiple steps (e.g., 2 steps):**
+  ```bash
+  make migrate-steps steps=2
+  ```
+- **To check the current migration version:**
+  ```bash
+  make migrate-version
+  ```
+- You can override the database host if needed (e.g., inside Docker):
+  ```bash
+  DB_HOST=db make migrate-up
+  ```
+- See the `Makefile` for more migration commands and options.
 
 ### Seeding the Database
 - To populate the database with initial data, run the seeders: `go run main.go --seedDev`
