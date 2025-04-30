@@ -99,23 +99,19 @@ The app includes comprehensive tests for all major functionalities:
 - This project uses [golang-migrate](https://github.com/golang-migrate/migrate) for database migrations.
 - **To run migrations (apply all up migrations):**
   ```bash
-  make migrate-up
+  docker compose exec app make migrate-up
   ```
 - **To rollback the last migration:**
   ```bash
-  make migrate-down
+  docker compose exec app make migrate-down
   ```
 - **To rollback multiple steps (e.g., 2 steps):**
   ```bash
-  make migrate-steps steps=2
+  docker compose exec app make migrate-steps steps=2
   ```
 - **To check the current migration version:**
   ```bash
-  make migrate-version
-  ```
-- You can override the database host if needed (e.g., inside Docker):
-  ```bash
-  DB_HOST=db make migrate-up
+  docker compose exec app make migrate-version
   ```
 - See the `Makefile` for more migration commands and options.
 

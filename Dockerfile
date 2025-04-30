@@ -21,5 +21,11 @@ RUN go build -o go-notes .
 # Expose the port the app runs on
 EXPOSE 8080
 
+# Install golang-migrate CLI
+RUN wget -O migrate.tar.gz https://github.com/golang-migrate/migrate/releases/download/v4.18.3/migrate.linux-amd64.tar.gz \
+    && tar -xzf migrate.tar.gz -C /usr/local/bin \
+    && rm migrate.tar.gz \
+    && chmod +x /usr/local/bin/migrate
+
 # Command to run the application
 CMD ["./go-notes"]
