@@ -9,7 +9,7 @@ import (
 )
 
 func SeedNotes(count int) {
-	noteRepo := repos.NoteRepo{DB: db.DB}
+	noteRepo := repos.NoteRepo{DB: db.GormDB}
 
 	notes := factories.NoteFactory(count, "", "")
 

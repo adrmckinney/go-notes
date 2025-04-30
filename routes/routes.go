@@ -1,13 +1,12 @@
 package routes
 
 import (
-	"database/sql"
-
 	"github.com/adrmckinney/go-notes/handlers"
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
-func NewRouter(db *sql.DB) *mux.Router {
+func NewRouter(db *gorm.DB) *mux.Router {
 	r := mux.NewRouter()
 
 	// Implemented init handlers because testing requires a

@@ -1,24 +1,25 @@
 package db
 
 import (
-	"database/sql"
+	// "database/sql"
+	"fmt"
 	"log"
 
 	"github.com/adrmckinney/go-notes/config"
 	_ "github.com/go-sql-driver/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-var DB *sql.DB
+var GormDB *gorm.DB
 
-func Init() {
+func InitGorm() {
+	cfg := config.GetDBConfig()
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Database)
 	var err error
-	dsn := config.GetDSN()
-	DB, err = sql.Open("mysql", dsn)
+	GormDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Database connection failed:", err)
-	}
-
-	if err = DB.Ping(); err != nil {
-		log.Fatal("Database unreachable:", err)
+		log.Fatalf("Failed to connect to database with GORM: %v", err)
 	}
 }

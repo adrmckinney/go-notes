@@ -33,7 +33,6 @@ func TestUpdateNote(t *testing.T) {
 			t.Fatalf("Failed to encode request body: %v", err)
 		}
 
-		// Create a new HTTP request
 		req, err := http.NewRequest("PUT", "/notes/1", bytes.NewBuffer(reqBody))
 		if err != nil {
 			t.Fatalf("Failed to create request: %v", err)
@@ -45,12 +44,10 @@ func TestUpdateNote(t *testing.T) {
 		rr := httptest.NewRecorder()
 		router.ServeHTTP(rr, req)
 
-		// Check the response status code
 		if status := rr.Code; status != http.StatusOK {
 			t.Errorf("Handler returned wrong status code: got %v want %v", status, http.StatusOK)
 		}
 
-		// Decode the response body
 		var updatedNote models.Note
 		err = json.Unmarshal(rr.Body.Bytes(), &updatedNote)
 		if err != nil {
@@ -73,7 +70,7 @@ func TestUpdateNote(t *testing.T) {
 		}
 
 		// Create a new HTTP request
-		req, err := http.NewRequest("PUT", "/notes/1", bytes.NewBuffer(reqBody))
+		req, err := http.NewRequest("PUT", "/notes/999", bytes.NewBuffer(reqBody))
 		if err != nil {
 			t.Fatalf("Failed to create request: %v", err)
 		}
@@ -85,8 +82,8 @@ func TestUpdateNote(t *testing.T) {
 		router.ServeHTTP(rr, req)
 
 		// Check the response status code
-		if status := rr.Code; status != http.StatusBadRequest {
-			t.Errorf("Handler returned wrong status code: got %v want %v", status, http.StatusBadRequest)
+		if status := rr.Code; status != http.StatusNotFound {
+			t.Errorf("Handler returned wrong status code: got %v want %v", status, http.StatusNotFound)
 		}
 
 	})

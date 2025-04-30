@@ -31,24 +31,19 @@ func TestGetNote(t *testing.T) {
 	router.HandleFunc("/notes/{id}", NoteHandler.GetNote).Methods("GET")
 
 	t.Run("Successful fetch", func(t *testing.T) {
-		// Create a new HTTP request
 		req, err := http.NewRequest("GET", "/notes/2", nil)
 		if err != nil {
 			t.Fatalf("Failed to create request: %v", err)
 		}
 
-		// Create a response recorder
 		rr := httptest.NewRecorder()
 
-		// Call the handler
 		router.ServeHTTP(rr, req)
 
-		// Check the response status code
 		if status := rr.Code; status != http.StatusOK {
 			t.Errorf("Handler returned wrong status code: got %v want %v", status, http.StatusOK)
 		}
 
-		// Decode the response body
 		var resNote models.Note
 		err = json.Unmarshal(rr.Body.Bytes(), &resNote)
 		if err != nil {
