@@ -12,7 +12,6 @@ import (
 )
 
 type NoteHandler struct {
-	// DB *sql.DB
 	NoteRepo *repos.NoteRepo
 }
 

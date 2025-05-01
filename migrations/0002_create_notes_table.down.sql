@@ -1,0 +1,2 @@
+ALTER TABLE notes DROP FOREIGN KEY fk_notes_user;
+DROP TABLE IF EXISTS notes;

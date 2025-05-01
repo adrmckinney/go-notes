@@ -8,6 +8,7 @@ import (
 
 type Note struct {
 	ID        uint           `json:"id,omitempty" gorm:"primaryKey"`
+	UserID    uint           `json:"userId" gorm:"not null"`
 	Title     string         `json:"title,omitempty"`
 	Content   string         `json:"content,omitempty"`
 	CreatedAt time.Time      `json:"createdAt,omitempty"`
