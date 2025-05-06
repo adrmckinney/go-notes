@@ -22,6 +22,14 @@ type UserWithToken struct {
 	Token string `json:"token"`
 }
 
+type UpdateUserRequest struct {
+	FirstName       *string `json:"firstName,omitempty"`
+	LastName        *string `json:"lastName,omitempty"`
+	Username        *string `json:"username,omitempty"`
+	Password        *string `json:"password,omitempty"`
+	ConfirmPassword *string `json:"confirmPassword" validate:"required,eqfield=Password"`
+}
+
 var AllowedUserUpdateFields = map[string]bool{
 	"firstName": true,
 	"lastName":  true,

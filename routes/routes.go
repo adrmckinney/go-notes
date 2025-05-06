@@ -28,6 +28,7 @@ var (
 	SIGN_UP     = RouteDefinition{Method: POST, Path: "/signup"}
 	SIGN_IN     = RouteDefinition{Method: POST, Path: "/signin"}
 	LOGOUT      = RouteDefinition{Method: DELETE, Path: "/logout"}
+	UPDATE_USER = RouteDefinition{Method: PUT, Path: "/users/{id}"}
 	GET_NOTES   = RouteDefinition{Method: GET, Path: "/notes"}
 	GET_NOTE    = RouteDefinition{Method: GET, Path: "/notes/{id}"}
 	CREATE_NOTE = RouteDefinition{Method: POST, Path: "/notes"}
@@ -54,6 +55,7 @@ func NewRouter(db *gorm.DB) *mux.Router {
 
 	// User
 	auth.HandleFunc(string(LOGOUT.Path), handlers.AuthHandler.Logout).Methods(string(LOGOUT.Method))
+	auth.HandleFunc(string(UPDATE_USER.Path), handlers.UserHandler.UpdateUser).Methods(string(UPDATE_USER.Method))
 
 	// Notes
 	auth.HandleFunc(string(GET_NOTES.Path), handlers.NoteHandler.GetNotes).Methods(string(GET_NOTES.Method))

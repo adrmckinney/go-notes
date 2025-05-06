@@ -18,8 +18,13 @@ type NoteHandler struct {
 
 // Go's http.Request holds a lot of data. It would be inefficient
 // to copy the Request. Passing the reference is more efficient.
-func (h *NoteHandler) GetNotes(w http.ResponseWriter, _ *http.Request) {
-	notes, err := h.NoteRepo.GetNotes()
+func (h *NoteHandler) GetNotes(w http.ResponseWriter, r *http.Request) {
+	authUser, ok := auth.GetAuthInfo(r)
+	if !ok {
+		http.Error(w, "Unable to find authUser", http.StatusInternalServerError)
+		return
+	}
+	notes, err := h.NoteRepo.GetNotes(authUser.UserID)
 	if err != nil {
 		http.Error(w, "Failed to fetch notes", http.StatusInternalServerError)
 		return

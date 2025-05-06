@@ -6,6 +6,7 @@ import (
 
 	"github.com/adrmckinney/go-notes/models"
 	"github.com/adrmckinney/go-notes/repos"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -56,7 +57,34 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	password, passOk := updateData["password"].(string)
+	confirmPassword, confirmOk := updateData["confirmPassword"].(string)
+
+	if passOk && (!confirmOk || confirmPassword == "") {
+		http.Error(w, "ConfirmPassword must be provided for password change", http.StatusBadRequest)
+		return
+	}
+
+	if passOk && confirmOk && password != confirmPassword {
+		http.Error(w, "Password and ConfirmPassword do not match", http.StatusBadRequest)
+		return
+	}
+
 	filtered := models.FilterUpdateFields(updateData, models.AllowedUserUpdateFields)
+
+	if passRaw, ok := filtered["password"]; ok && passRaw != "" {
+		if passStr, ok := passRaw.(string); ok {
+			hashedPass, err := bcrypt.GenerateFromPassword([]byte(passStr), bcrypt.DefaultCost)
+			if err != nil {
+				http.Error(w, "Failed to hash password", http.StatusInternalServerError)
+				return
+			}
+			filtered["password"] = string(hashedPass)
+		} else {
+			http.Error(w, "Password must be a string", http.StatusBadRequest)
+			return
+		}
+	}
 
 	updatedUser, err := h.UserRepo.UpdateUser(id, filtered)
 	if err != nil {
@@ -67,6 +95,7 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Note not found", http.StatusNotFound)
 			return
 		}
+
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

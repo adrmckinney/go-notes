@@ -29,9 +29,9 @@ type InitUserOptions struct {
 }
 
 type ServeOpts struct {
-	PathParams  map[string]interface{}
-	QueryParams map[string]interface{}
-	Payload     interface{}
+	PathParams  map[string]any
+	QueryParams map[string]any
+	Payload     any
 	AuthToken   *string
 }
 

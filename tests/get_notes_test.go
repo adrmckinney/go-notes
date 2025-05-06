@@ -13,8 +13,10 @@ import (
 func TestGetNotes(t *testing.T) {
 	TearDown(t)
 
-	notes := factories.NoteFactory(2, []uint{1}, "", "")
 	user := InitUser(t, InitUserOptions{})
+	otherUser := InitUser(t, InitUserOptions{})
+	notes := factories.NoteFactory(2, []uint{user.ID}, "", "")
+	factories.NoteFactory(2, []uint{otherUser.ID}, "", "")
 
 	// Seed the database with test data
 	for _, note := range notes {
@@ -41,5 +43,17 @@ func TestGetNotes(t *testing.T) {
 	// Compare the length of the original notes and the response notes
 	if len(resNotes) != len(notes) {
 		t.Fatalf("Length mismatch: expected %d, got %d", len(notes), len(resNotes))
+	}
+
+	allMatch := true
+	for _, note := range resNotes {
+		if note.UserID != user.ID {
+			allMatch = false
+			break
+		}
+
+		if !allMatch {
+			t.Fatalf("Get notes query returned notes belonging to other users")
+		}
 	}
 }
