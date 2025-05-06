@@ -7,21 +7,19 @@ import (
 )
 
 type User struct {
-	ID        uint           `json:"id,omitempty" gorm:"primaryKey"`
-	FirstName string         `json:"firstName"`
-	LastName  string         `json:"lastName"`
-	Username  string         `json:"username" gorm:"unique"`
-	Password  string         `json:"password"`
-	CreatedAt time.Time      `json:"createdAt,omitempty"`
-	UpdatedAt time.Time      `json:"updatedAt,omitempty"`
-	DeletedAt gorm.DeletedAt `json:"deletedAt,omitempty" gorm:"index"`
+	ID        uint            `json:"id,omitempty" gorm:"primaryKey"`
+	FirstName string          `json:"firstName"`
+	LastName  string          `json:"lastName"`
+	Username  string          `json:"username" gorm:"unique"`
+	Password  string          `json:"password"`
+	CreatedAt *time.Time      `json:"createdAt,omitempty"`
+	UpdatedAt *time.Time      `json:"updatedAt,omitempty"`
+	DeletedAt *gorm.DeletedAt `json:"deletedAt,omitempty" gorm:"index"`
 }
 
-var AllowedUserCreateFields = map[string]bool{
-	"firstName": true,
-	"lastName":  true,
-	"username":  true,
-	"password":  true,
+type UserWithToken struct {
+	User
+	Token string `json:"token"`
 }
 
 var AllowedUserUpdateFields = map[string]bool{

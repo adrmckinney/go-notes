@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/adrmckinney/go-notes/auth"
 	"github.com/adrmckinney/go-notes/models"
 	"github.com/adrmckinney/go-notes/repos"
 	"github.com/gorilla/mux"
@@ -43,8 +44,16 @@ func (h *NoteHandler) GetNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *NoteHandler) CreateNote(w http.ResponseWriter, r *http.Request) {
+	authInfo, ok := auth.GetAuthInfo(r)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	userID := authInfo.UserID
+
 	var note models.Note
-	if err := json.NewDecoder(r.Body).Decode(&note); err != nil { // get an explanation for this syntax
+	if err := json.NewDecoder(r.Body).Decode(&note); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
@@ -53,6 +62,7 @@ func (h *NoteHandler) CreateNote(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Title and Content are required", http.StatusBadRequest)
 		return
 	}
+	note.UserID = userID
 	createdNote, err := h.NoteRepo.CreateNote(note)
 
 	if err != nil {
@@ -79,7 +89,7 @@ func (h *NoteHandler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filtered := models.FilterUpsertFields(updateData, models.AllowedNoteUpdateFields)
+	filtered := models.FilterUpdateFields(updateData, models.AllowedNoteUpdateFields)
 
 	if len(updateData) == 0 {
 		http.Error(w, "No update data provided", http.StatusBadRequest)

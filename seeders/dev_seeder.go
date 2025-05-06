@@ -10,15 +10,7 @@ func RunDevSeeders() {
 
 	totalStart := time.Now()
 
-	start := time.Now()
-	fmt.Println("Seeding users...")
-	SeedUsers(2)
-	fmt.Printf("Users seeded in %v\n", time.Since(start))
-
-	start = time.Now()
-	fmt.Println("Seeding notes...")
-	SeedNotes(10)
-	fmt.Printf("Notes seeded in %v\n", time.Since(start))
+	_ = SeedUserNotes(5, 50)
 
 	fmt.Printf("All development seeders completed in %v!\n", time.Since(totalStart))
 }

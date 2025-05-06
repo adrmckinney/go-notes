@@ -1,22 +1,23 @@
 package seeders
 
 import (
-	"fmt"
-
 	"github.com/adrmckinney/go-notes/db"
 	"github.com/adrmckinney/go-notes/factories"
 	"github.com/adrmckinney/go-notes/repos"
 )
 
-func SeedUsers(count int) {
+func SeedUsers(count int) ([]uint, error) {
 	userRepo := repos.UserRepo{DB: db.GormDB}
 
-	users := factories.UserFactory(count, "", "", "", "")
-
+	users := factories.UserFactory(factories.UserFactoryOptions{Count: count})
+	var userIds []uint
 	for _, user := range users {
-		_, err := userRepo.CreateUser(user)
+		created, err := userRepo.CreateUser(user)
 		if err != nil {
-			fmt.Printf("Failed to seed user: %v\n", err)
+			return nil, err
 		}
+		userIds = append(userIds, created.ID)
 	}
+
+	return userIds, nil
 }

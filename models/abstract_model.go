@@ -1,8 +1,8 @@
 package models
 
-// FilterUpsertFields returns a new map containing only the key-value pairs from the input map
-// whose keys are present in the allowed map. This is useful for sanitizing create and update
-// payloads to ensure that only permitted fields are included in database such operations.
+// FilterUpdateFields returns a new map containing only the key-value pairs from the input map
+// whose keys are present in the allowed map. This is useful for sanitizing update payloads
+// to ensure that only permitted fields are included in database such operations.
 //
 // Parameters:
 //   - input:   map[string]interface{} containing all fields from the request or source.
@@ -10,7 +10,7 @@ package models
 //
 // Returns:
 //   - map[string]interface{} containing only allowed fields from the input.
-func FilterUpsertFields(input map[string]interface{}, allowed map[string]bool) map[string]interface{} {
+func FilterUpdateFields(input map[string]interface{}, allowed map[string]bool) map[string]interface{} {
 	filtered := make(map[string]interface{})
 	for k, v := range input {
 		if allowed[k] {

@@ -20,6 +20,12 @@ func (r *UserRepo) GetUserById(id uint) (models.User, error) {
 	return user, nil
 }
 
+func (r *UserRepo) GetUserByUsername(username string) (models.User, error) {
+	var user models.User
+	result := r.DB.Where("username = ?", username).First(&user)
+	return user, result.Error
+}
+
 func (r *UserRepo) GetUsers() ([]models.User, error) {
 	var users []models.User
 	result := r.DB.Find(&users)

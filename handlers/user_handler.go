@@ -38,23 +38,6 @@ func (h *UserHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
-		return
-	}
-
-	createdUser, err := h.UserRepo.CreateUser(user)
-	if err != nil {
-		http.Error(w, "Failed to create user", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(createdUser)
-}
-
 func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	id, err := GetIdFromUrlPath(r)
 	if err != nil {
@@ -73,7 +56,7 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filtered := models.FilterUpsertFields(updateData, models.AllowedUserUpdateFields)
+	filtered := models.FilterUpdateFields(updateData, models.AllowedUserUpdateFields)
 
 	updatedUser, err := h.UserRepo.UpdateUser(id, filtered)
 	if err != nil {

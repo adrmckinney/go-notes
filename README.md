@@ -55,7 +55,7 @@ The app includes comprehensive tests for all major functionalities:
 - **GetNotes**: Tests retrieving all notes.
 - **DeleteNote**: Tests deleting a note by ID.
 - **Test Utilities**:
-  - `CleanUpDatabases`: Ensures the database is cleaned up after each test.
+  - `CleanUpTables`: Ensures the database is cleaned up after each test.
   - `Factories`: Generate test data for notes.
 
 ---
