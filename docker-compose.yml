@@ -20,6 +20,8 @@ services:
       sh -c "
         ./wait-for-it.sh db:3306 -t 60 -- ./go-notes
       "
+    env_file:
+      - .env
 
   db:
     image: mysql:8.0
