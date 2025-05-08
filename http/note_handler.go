@@ -87,8 +87,6 @@ func (h *NoteHandler) CreateNote(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(createdNote)
 }
 
-// HERE
-
 func (h *NoteHandler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 	authInfo, ok := auth.GetAuthInfo(r)
 	if !ok {
