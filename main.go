@@ -6,9 +6,15 @@ import (
 
 	"github.com/adrmckinney/go-notes/db"
 	"github.com/adrmckinney/go-notes/routes"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("[WARNING] .env file not loaded. Falling back to package environment variables.")
+	}
+
 	db.InitGorm()
 
 	r := routes.NewRouter(db.GormDB)

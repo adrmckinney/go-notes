@@ -15,7 +15,7 @@ var GormDB *gorm.DB
 
 func InitGorm() {
 	cfg := config.GetDBConfig()
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=UTC",
 		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Database)
 	var err error
 	GormDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 )
 
@@ -11,6 +12,10 @@ type DBConfig struct {
 	User     string
 	Password string
 	Database string
+}
+
+type Config struct {
+	JwtSecret string
 }
 
 func GetDBConfig() DBConfig {
@@ -58,4 +63,16 @@ func GetDSN() string {
 func GetServerDSN() string {
 	config := GetDBConfig()
 	return config.User + ":" + config.Password + "@tcp(" + config.Host + ":" + config.Port + ")/"
+}
+
+func GetConfig() Config {
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		jwtSecret = "non_secure_secret_Add_env_and_add_key_from_openssl_rand_-hex_32"
+		log.Println("[WARNING] JWT_SECRET not set in .env. Using insecure fallback secret.")
+	}
+
+	return Config{
+		JwtSecret: jwtSecret,
+	}
 }

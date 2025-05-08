@@ -1,22 +1,20 @@
 package tests
 
 import (
-	"bytes"
 	"encoding/json"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/adrmckinney/go-notes/factories"
 	"github.com/adrmckinney/go-notes/models"
-	"github.com/gorilla/mux"
+	"github.com/adrmckinney/go-notes/routes"
 )
 
 func TestUpdateNote(t *testing.T) {
-	// Ensure the database is cleaned up after the test
-	CleanUpDatabases(t, TestDB, []string{"notes"})
+	TearDown(t)
 
-	notes := factories.NoteFactory(1, "", "")
+	user := InitUser(t, InitUserOptions{})
+	notes := factories.NoteFactory(1, []uint{1}, "", "")
 	note := notes[0]
 	_, err := NoteRepo.CreateNote(note)
 	if err != nil {
@@ -28,21 +26,8 @@ func TestUpdateNote(t *testing.T) {
 		body := models.Note{
 			Title: newTitle,
 		}
-		reqBody, err := json.Marshal(body)
-		if err != nil {
-			t.Fatalf("Failed to encode request body: %v", err)
-		}
 
-		req, err := http.NewRequest("PUT", "/notes/1", bytes.NewBuffer(reqBody))
-		if err != nil {
-			t.Fatalf("Failed to create request: %v", err)
-		}
-
-		router := mux.NewRouter()
-		router.HandleFunc("/notes/{id}", NoteHandler.UpdateNote).Methods("PUT")
-
-		rr := httptest.NewRecorder()
-		router.ServeHTTP(rr, req)
+		rr := CreateRouteAndServe(t, routes.UPDATE_NOTE, ServeOpts{AuthToken: &user.Token, Payload: body, PathParams: map[string]any{"id": 1}})
 
 		if status := rr.Code; status != http.StatusOK {
 			t.Errorf("Handler returned wrong status code: got %v want %v", status, http.StatusOK)
@@ -60,26 +45,11 @@ func TestUpdateNote(t *testing.T) {
 	})
 
 	t.Run("Error missing update data", func(t *testing.T) {
-
 		body := models.Note{
 			Content: "",
 		}
-		reqBody, err := json.Marshal(body)
-		if err != nil {
-			t.Fatalf("Failed to encode request body: %v", err)
-		}
 
-		// Create a new HTTP request
-		req, err := http.NewRequest("PUT", "/notes/999", bytes.NewBuffer(reqBody))
-		if err != nil {
-			t.Fatalf("Failed to create request: %v", err)
-		}
-
-		router := mux.NewRouter()
-		router.HandleFunc("/notes/{id}", NoteHandler.UpdateNote).Methods("PUT")
-
-		rr := httptest.NewRecorder()
-		router.ServeHTTP(rr, req)
+		rr := CreateRouteAndServe(t, routes.UPDATE_NOTE, ServeOpts{AuthToken: &user.Token, Payload: body, PathParams: map[string]any{"id": 999}})
 
 		// Check the response status code
 		if status := rr.Code; status != http.StatusNotFound {

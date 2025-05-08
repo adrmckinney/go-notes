@@ -2,5 +2,4 @@
 .gitignore
 tests
 node_modules
-.env
 *.log

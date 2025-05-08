@@ -8,19 +8,20 @@ import (
 	"gorm.io/gorm"
 )
 
-func CleanUpDatabases(t *testing.T, testDB *gorm.DB, tables []string) {
+func CleanUpTables(t *testing.T, testDB *gorm.DB, tables []string) {
 	for _, table := range tables {
+		tbl := table // capture loop variable
 		t.Cleanup(func() {
-			query := fmt.Sprintf("DELETE FROM %s", table)
+			query := fmt.Sprintf("DELETE FROM %s", tbl)
 			if err := testDB.Exec(query).Error; err != nil {
-				t.Fatalf("Failed to clean up test database: %v", err)
+				t.Errorf("Failed to clean up table %s: %v", tbl, err)
+			}
+
+			// Reset AUTOINCREMENT counter for SQLite
+			if err := testDB.Exec(fmt.Sprintf("DELETE FROM sqlite_sequence WHERE name='%s'", tbl)).Error; err != nil {
+				t.Errorf("Failed to reset AUTOINCREMENT for table %s: %v", tbl, err)
 			}
 		})
-
-		// Reset AUTOINCREMENT counter for SQLite
-		if err := testDB.Exec(fmt.Sprintf("DELETE FROM sqlite_sequence WHERE name='%s'", table)).Error; err != nil {
-			t.Fatalf("Failed to reset AUTOINCREMENT counter for table %s: %v", table, err)
-		}
 	}
 }
 

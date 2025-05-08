@@ -7,6 +7,38 @@ import (
 	"net/http"
 )
 
+type RandomUser struct {
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+}
+
+func GetRandomUsers(count int) ([]RandomUser, error) {
+	url := fmt.Sprintf("https://fakerapi.it/api/v1/users?_quantity=%d", count)
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch random users: %w", err)
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	var result struct {
+		Data []RandomUser `json:"data"`
+	}
+
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse JSON response: %w", err)
+	}
+
+	return result.Data, nil
+}
+
 func GetRandomSentences(count int) ([]string, []string, error) {
 	url := fmt.Sprintf("https://fakerapi.it/api/v1/texts?_quantity=%d&_characters=50", count)
 	res, err := http.Get(url)

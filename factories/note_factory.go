@@ -13,24 +13,28 @@ import (
 // arguments and instead uses the random data for each note.
 //
 // Params:
-//
-//	count   - the number of notes to generate
-//	title   - (ignored) placeholder for compatibility
-//	content - (ignored) placeholder for compatibility
+//   - count: the number of notes to generate
+//   - userIDs: a slice of user IDs to assign to notes (rotated if count > len(userIDs))
+//   - title, content: (ignored) placeholders for compatibility
 //
 // Returns:
-//
-//	[]models.Note - a slice of generated Note structs with random titles and content
-func NoteFactory(count int, title string, content string) []models.Note {
+//   - []models.Note: a slice of generated Note structs with random titles, content, and rotated user IDs
+func NoteFactory(count int, userIDs []uint, title string, content string) []models.Note {
 	notes := make([]models.Note, count)
 	titles, sentences, err := utils.GetRandomSentences(count)
 	if err != nil {
 		fmt.Printf("Failed to fetch random sentences. Setting to empty string for default value. Error: %v\n", err)
 		sentences = make([]string, count)
+		titles = make([]string, count)
 	}
 
 	for i := range count {
+		userID := uint(0)
+		if len(userIDs) > 0 {
+			userID = userIDs[i%len(userIDs)]
+		}
 		notes[i] = models.Note{
+			UserID:  userID,
 			Title:   titles[i],
 			Content: sentences[i],
 		}

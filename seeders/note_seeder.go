@@ -11,7 +11,8 @@ import (
 func SeedNotes(count int) {
 	noteRepo := repos.NoteRepo{DB: db.GormDB}
 
-	notes := factories.NoteFactory(count, "", "")
+	// This needs to change to handle the userId and count
+	notes := factories.NoteFactory(count, []uint{1, 2}, "", "")
 
 	for _, note := range notes {
 		_, err := noteRepo.CreateNote(note)

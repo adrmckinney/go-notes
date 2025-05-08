@@ -20,9 +20,9 @@ func (r *NoteRepo) GetNoteById(id uint) (models.Note, error) {
 	return note, nil
 }
 
-func (r *NoteRepo) GetNotes() ([]models.Note, error) {
+func (r *NoteRepo) GetNotes(userId uint) ([]models.Note, error) {
 	var notes []models.Note
-	result := r.DB.Find(&notes)
+	result := r.DB.Where("user_id = ?", userId).Find(&notes)
 	if result.Error != nil {
 		return []models.Note{}, result.Error
 	}
@@ -59,7 +59,7 @@ func (r *NoteRepo) UpdateNote(id uint, updated map[string]interface{}) (models.N
 	return note, nil
 }
 
-func (r *NoteRepo) DeleteNote(id string) error {
+func (r *NoteRepo) DeleteNote(id uint) error {
 	result := r.DB.Delete(&models.Note{}, id)
 	if result.RowsAffected == 0 {
 		return fmt.Errorf("note not found")
