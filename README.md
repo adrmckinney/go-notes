@@ -17,12 +17,18 @@
       - [Users](#users)
       - [Notes](#notes)
   - [Running Tests](#running-tests)
-  - [Teardown Instructions](#teardown-instructions)
   - [API Endpoints](#api-endpoints)
     - [Users](#users)
     - [Notes](#notes-1)
+  - [Getting Started without Docker](#getting-started-without-docker)
+    - [Prerequisites](#prerequisites-1)
+    - [Get the app](#get-the-app-1)
+    - [Starting the Server:](#starting-the-server)
+    - [Migrations](#migrations-1)
+    - [Seeding the Database](#seeding-the-database-1)
+    - [Running Tests](#running-tests-1)
 
-This is a simple Notes application built with Go. It supports user authentication and authorization, allowing each user to manage their own notes. The app follows a clean, layered architecture with separation of concerns and includes comprehensive tests. Features include signup/signin, CRUD operations for notes, and database seeding with a demo user for testing.
+This is a simple Notes application built with Go. It supports user authentication and authorization, allowing each user to manage their own notes. The app follows a clean, layered architecture with separation of concerns and includes comprehensive API tests. Features include signup/signin, CRUD operations for notes, and database seeding with a demo user.
 
 There is currently no frontend for this app. I wanted to learn Go so implementing a UI is beyond the scope of this work. My goals for this app were to build a CRUD app that had some basic functionalities that are expected with backend projects, like AuthMiddleware for authentication, authorization, testing, seeders, factories and a clean architecture.
 
@@ -87,10 +93,9 @@ The app includes API tests covering:
 ## Getting Started
 
 ### Prerequisites
-- Go installed on your machine (version 1.18 or higher).
-- Docker installed (if using Docker).
-- Docker Compose installed (if using Docker).
-- Postman or any other API testing tool.
+- Docker installed.
+- Docker Compose installed.
+- Postman or any other API tool.
 ---
 
 ### Get the app
@@ -230,9 +235,6 @@ Once the server is running, you can use Postman to interact with the API. Below 
 ## Running Tests
 To run the tests, use the following command: `go test -v ./tests/...`
 
-## Teardown Instructions
-To completely remove the database, run: `go run main.go --remove`
-
 ## API Endpoints
 ### Users
 - Sign Up: `POST /signup`
@@ -245,3 +247,56 @@ To completely remove the database, run: `go run main.go --remove`
 - Create Note: `POST /notes`
 - Update Note: `PUT /notes`
 - Delete Note: `DELETE /notes/{id}`
+
+## Getting Started without Docker
+
+### Prerequisites
+- Go installed on your machine (version 1.18 or higher).
+- MySQL installed and running.
+- Create a MySQL database named `mckinney_go_notes_db`.
+- Postman or any other API tool.
+---
+
+### Get the app
+- Clone it: `git clone https://github.com/adrmckinney/go-notes.git`
+
+### Starting the Server:
+ - In the root of the project, run:
+   ```bash
+   go run main.go
+   ```
+ - This will start the server on `localhost:8080`.
+
+### Migrations
+  - This project uses [golang-migrate](https://github.com/golang-migrate/migrate) for database migrations.
+  - **To run migrations (apply all up migrations):**
+    ```bash
+    make migrate-up
+    ```
+  - **To rollback the last migration:**
+    ```bash
+    make migrate-down
+    ```
+ - **To rollback multiple steps (e.g., 2 steps):**
+   ```bash
+   make migrate-steps steps=2
+   ```
+ - **To check the current migration version:**
+   ```bash
+   make migrate-version
+   ```
+ - See the `Makefile` for more migration commands and options.
+  
+### Seeding the Database
+- To populate the database with initial data, run the seeders: `make seed-dev`
+- This will create initial data.
+- Demo user credentials:
+  ```json
+      {
+        "username": "demoUser",
+        "password": "password"
+      }
+    ```
+### Running Tests
+- To run the tests, use the following command: `go test -v ./tests/...`
+- To run an individual test file, user: `go test -v ./tests <TestName>`
