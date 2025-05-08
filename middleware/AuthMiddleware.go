@@ -21,10 +21,11 @@ func AuthMiddleware(jwtKey []byte, tokenRepo repos.UserTokenRepo) func(http.Hand
 				http.Error(w, "Missing or invalid Authorization header", http.StatusUnauthorized)
 				return
 			}
+
 			tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
 			// Validate JWT
-			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 				return jwtKey, nil
 			})
 

@@ -1,9 +1,8 @@
 package routes
 
 import (
-	"os"
-
-	"github.com/adrmckinney/go-notes/handlers"
+	"github.com/adrmckinney/go-notes/config"
+	"github.com/adrmckinney/go-notes/http"
 	"github.com/adrmckinney/go-notes/middleware"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -38,12 +37,12 @@ var (
 
 func NewRouter(db *gorm.DB) *mux.Router {
 	r := mux.NewRouter()
-	var jwtKey = []byte(os.Getenv("JWT_SECRET")) // TODO this needs to be added to DOCKER
+	var jwtKey = []byte(config.GetConfig().JwtSecret)
 
 	// Implemented init handlers because testing requires a
 	// sqlite db to be created and used, which means we need to
 	// pass in the correct DB here.
-	handlers := handlers.InitHandlers(db)
+	handlers := http.InitHandlers(db)
 
 	// Guest routes
 	r.HandleFunc(string(SIGN_UP.Path), handlers.AuthHandler.SignUp).Methods(string(SIGN_UP.Method))
@@ -51,7 +50,7 @@ func NewRouter(db *gorm.DB) *mux.Router {
 
 	// Auth routes
 	auth := r.PathPrefix("/").Subrouter()
-	auth.Use(middleware.AuthMiddleware(jwtKey, *handlers.AuthHandler.UserTokenRepo))
+	auth.Use(middleware.AuthMiddleware(jwtKey, handlers.AuthHandler.AuthService.UserTokenRepo))
 
 	// User
 	auth.HandleFunc(string(LOGOUT.Path), handlers.AuthHandler.Logout).Methods(string(LOGOUT.Method))

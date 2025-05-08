@@ -1,7 +1,8 @@
-package handlers
+package http
 
 import (
 	"github.com/adrmckinney/go-notes/repos"
+	"github.com/adrmckinney/go-notes/services"
 	"gorm.io/gorm"
 )
 
@@ -12,20 +13,32 @@ type Handlers struct {
 }
 
 func InitHandlers(db *gorm.DB) *Handlers {
+	// Initialize Repositories
 	userRepo := &repos.UserRepo{DB: db}
 	userTokenRepo := &repos.UserTokenRepo{DB: db}
 	noteRepo := &repos.NoteRepo{DB: db}
 
-	// Initialize handlers with repositories
+	// Initialize Services with Repos
+	authService := &services.AuthService{
+		UserRepo:      *userRepo,
+		UserTokenRepo: *userTokenRepo,
+	}
+	userService := &services.UserService{
+		UserRepo: *userRepo,
+	}
+	noteService := &services.NoteService{
+		NoteRepo: *noteRepo,
+	}
+
+	// Initialize Handlers with Services
 	authHandler := &AuthHandler{
-		UserRepo:      userRepo,
-		UserTokenRepo: userTokenRepo,
+		AuthService: *authService,
 	}
 	userHandler := &UserHandler{
-		UserRepo: userRepo,
+		UserService: *userService,
 	}
 	noteHandler := &NoteHandler{
-		NoteRepo: noteRepo,
+		NoteService: *noteService,
 	}
 
 	return &Handlers{

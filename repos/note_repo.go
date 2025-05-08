@@ -59,7 +59,7 @@ func (r *NoteRepo) UpdateNote(id uint, updated map[string]interface{}) (models.N
 	return note, nil
 }
 
-func (r *NoteRepo) DeleteNote(id string) error {
+func (r *NoteRepo) DeleteNote(id uint) error {
 	result := r.DB.Delete(&models.Note{}, id)
 	if result.RowsAffected == 0 {
 		return fmt.Errorf("note not found")

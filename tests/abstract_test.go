@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
+	"log"
+	stdhttp "net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
@@ -15,11 +16,13 @@ import (
 	"github.com/adrmckinney/go-notes/auth"
 	"github.com/adrmckinney/go-notes/db"
 	"github.com/adrmckinney/go-notes/factories"
-	"github.com/adrmckinney/go-notes/handlers"
+	myhttp "github.com/adrmckinney/go-notes/http"
 	"github.com/adrmckinney/go-notes/models"
 	"github.com/adrmckinney/go-notes/repos"
 	"github.com/adrmckinney/go-notes/routes"
+	"github.com/adrmckinney/go-notes/services"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
 
@@ -35,43 +38,54 @@ type ServeOpts struct {
 	AuthToken   *string
 }
 
-var TestDB *gorm.DB                    // Shared test database connection
-var NoteRepo *repos.NoteRepo           // Shared NoteRepo instance
-var UserTokenRepo *repos.UserTokenRepo // Shared NoteRepo instance
-var UserRepo *repos.UserRepo           // Shared NoteRepo instance
-var UserHandler *handlers.UserHandler
-var AuthHandler *handlers.AuthHandler
-var NoteHandler *handlers.NoteHandler
+var TestDB *gorm.DB // Shared test database connection
+var NoteRepo *repos.NoteRepo
+var UserTokenRepo *repos.UserTokenRepo
+var UserRepo *repos.UserRepo
+
+// Shared services
+var NoteService *services.NoteService
+var UserService *services.UserService
+var AuthService *services.AuthService
+
+// Shared HTTP handlers
+var NoteHandler *myhttp.NoteHandler
+var UserHandler *myhttp.UserHandler
+var AuthHandler *myhttp.AuthHandler
+
 var router *mux.Router
 
-// var User models.UserWithToken
-
-// TestMain is the entry point for all tests in the tests package and its subpackages
 func TestMain(m *testing.M) {
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Println("[WARNING] .env file not loaded. Falling back to package environment variables.")
+	}
+
 	// Initialize the test database
 	TestDB = db.InitTestGorm()
 
-	// Initialize repositories and handlers
-	initializeTestDependencies()
+	// Initialize repositories, services, and handlers and set test variables
+	handlers := myhttp.InitHandlers(TestDB)
+	AuthHandler = handlers.AuthHandler
+	UserHandler = handlers.UserHandler
+	NoteHandler = handlers.NoteHandler
+
+	AuthService = &AuthHandler.AuthService
+	UserService = &UserHandler.UserService
+	NoteService = &NoteHandler.NoteService
+
+	UserTokenRepo = &AuthService.UserTokenRepo
+	UserRepo = &UserService.UserRepo
+	NoteRepo = &NoteService.NoteRepo
+
+	// Initialize router with TestDB
 	router = routes.NewRouter(TestDB)
+
 	// Run the tests
 	code := m.Run()
 
 	// Exit with the test result code
 	os.Exit(code)
-}
-
-// initializeTestDependencies initializes shared repositories and handlers for tests
-func initializeTestDependencies() {
-	// Initialize the NoteRepo
-	NoteRepo = &repos.NoteRepo{DB: TestDB}
-	UserRepo = &repos.UserRepo{DB: TestDB}
-	UserTokenRepo = &repos.UserTokenRepo{DB: TestDB}
-
-	// Initialize the NoteHandler with the NoteRepo
-	NoteHandler = &handlers.NoteHandler{NoteRepo: NoteRepo}
-	UserHandler = &handlers.UserHandler{UserRepo: UserRepo}
-	AuthHandler = &handlers.AuthHandler{UserTokenRepo: UserTokenRepo, UserRepo: UserRepo}
 }
 
 func TearDown(t *testing.T) {
@@ -98,18 +112,12 @@ func InitUser(t *testing.T, opts InitUserOptions) models.UserWithToken {
 		ConfirmPassword: body[0].Password,
 	}
 
-	rr := CreateRouteAndServe(t, routes.SIGN_UP, ServeOpts{Payload: signupUser})
-
-	if status := rr.Code; status != http.StatusCreated {
-		t.Errorf("Handler returned wrong status code: got %v want %v", status, http.StatusOK)
-	}
-
-	var user models.UserWithToken
-	err := json.Unmarshal(rr.Body.Bytes(), &user)
+	user, err := AuthService.SignUp(signupUser)
 	if err != nil {
-		t.Fatalf("Failed to decode response body: %v", err)
+		t.Fatalf("Failed to create test user: %v", err.Error())
 	}
-	// add the password back
+
+	// add the password back because service removes it from response
 	user.Password = signupUser.Password
 	return user
 }
@@ -157,7 +165,7 @@ func CreateRouteAndServe(
 	}
 
 	// Create HTTP request
-	req, err := http.NewRequest(string(routeDefinition.Method), finalPath, reqBody)
+	req, err := stdhttp.NewRequest(string(routeDefinition.Method), finalPath, reqBody)
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
